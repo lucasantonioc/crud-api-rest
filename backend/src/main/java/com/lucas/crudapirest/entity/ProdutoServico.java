@@ -9,6 +9,7 @@ import com.lucas.crudapirest.enumeration.*;
 import com.lucas.crudapirest.dto.ProdutoServicoUpdateDTO;
 
 import static com.lucas.crudapirest.enumeration.EnumStatusProdutoServico.ATIVO;
+import static com.lucas.crudapirest.enumeration.EnumStatusProdutoServico.INATIVO;
 import static com.lucas.crudapirest.enumeration.EnumTipoProdutoServico.PRODUTO;
 import static java.util.Optional.*;
 
@@ -23,6 +24,7 @@ public class ProdutoServico implements Serializable {
 	@GeneratedValue
 	private UUID id;
 
+	@Builder.Default
 	@Column(name = "valor_unitario", nullable = false)
 	private BigDecimal valorUnitario = BigDecimal.ZERO;
 
@@ -30,14 +32,13 @@ public class ProdutoServico implements Serializable {
 	private String descricao;
 
 	@Enumerated(EnumType.STRING)
+	@Builder.Default
 	@Column(nullable = false)
-	private EnumStatusProdutoServico status;
+	private EnumStatusProdutoServico status = ATIVO;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private EnumTipoProdutoServico tipo;
-
-	//TODO desativar produto
 
 	public boolean isProduto() {
 		return this.tipo == PRODUTO;
@@ -47,11 +48,17 @@ public class ProdutoServico implements Serializable {
 		return this.status == ATIVO;
 	}
 
+	public void alterarStatus() {
+		if (this.status == ATIVO) {
+			this.status = INATIVO;
+		} else {
+			this.status = ATIVO;
+		}
+	}
+
 	public void update(ProdutoServicoUpdateDTO produtoServicoUpdateDTO) {
 		valorUnitario = ofNullable(produtoServicoUpdateDTO.getValorUnitario()).orElse(valorUnitario);
 		descricao = ofNullable(produtoServicoUpdateDTO.getDescricao()).orElse(descricao);
-		status = ofNullable(produtoServicoUpdateDTO.getStatus()).orElse(status);
-		tipo = ofNullable(produtoServicoUpdateDTO.getTipo()).orElse(tipo);
 	}
 
 }

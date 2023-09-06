@@ -17,7 +17,7 @@ public interface PedidoService {
 	void delete(UUID id);
 	PedidoResponseDTO update(Pedido pedido);
 
-	PedidoResponseDTO fechar(UUID pedidoId);
+	PedidoResponseDTO alterarStatus(UUID pedidoId);
 
 	Page<PedidoResponseDTO> findAll(Pageable pageable, PedidoFilterDTO filterDTO);
 

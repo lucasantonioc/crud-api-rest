@@ -22,10 +22,12 @@ public class PedidoItem implements Serializable {
 	@GeneratedValue
 	private UUID id;
 
+	@Builder.Default
 	@PositiveOrZero
 	@Column(name = "valor_unitario_venda", nullable = false)
 	private BigDecimal valorUnitarioVenda = BigDecimal.ZERO;
 
+	@Builder.Default
 	@Positive
 	@Column(nullable = false)
 	private BigDecimal quantidade = BigDecimal.ZERO;

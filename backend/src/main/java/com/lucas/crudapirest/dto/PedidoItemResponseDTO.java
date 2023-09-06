@@ -1,5 +1,6 @@
 package com.lucas.crudapirest.dto;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import java.util.UUID;
 import java.math.BigDecimal;

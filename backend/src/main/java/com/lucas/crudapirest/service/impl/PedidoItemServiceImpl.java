@@ -1,9 +1,12 @@
 package com.lucas.crudapirest.service.impl;
 
+import com.lucas.crudapirest.dto.filter.PedidoItemFilterDTO;
 import com.lucas.crudapirest.exception.BusinessException;
 import com.lucas.crudapirest.exception.RecordNotFoundException;
 import com.lucas.crudapirest.repository.ProdutoServicoRepository;
 import com.lucas.crudapirest.service.PedidoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -15,6 +18,8 @@ import com.lucas.crudapirest.dto.PedidoItemPersistDTO;
 import com.lucas.crudapirest.dto.PedidoItemResponseDTO;
 import com.lucas.crudapirest.dto.PedidoItemUpdateDTO;
 import com.lucas.crudapirest.entity.PedidoItem;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 @Service
@@ -32,7 +37,12 @@ public class PedidoItemServiceImpl implements PedidoItemService {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	private void validate(PedidoItemPersistDTO pedidoItemPersistDTO) {
+	private void validate(UUID pedidoId, PedidoItemPersistDTO pedidoItemPersistDTO) {
+		var pedido = pedidoService.findById(pedidoId);
+		if (!pedido.isAberto()) {
+			throw new BusinessException("O pedido já está fechado");
+		}
+
 		var produtoServico = produtoServicoRepository.findById(pedidoItemPersistDTO.getProdutoServicoId())
 				.orElseThrow(() -> new RecordNotFoundException(pedidoItemPersistDTO.getProdutoServicoId()));
 
@@ -43,7 +53,7 @@ public class PedidoItemServiceImpl implements PedidoItemService {
 
 	@Override
 	public PedidoItemResponseDTO create(UUID pedidoId, PedidoItemPersistDTO pedidoItemPersistDTO) {
-		validate(pedidoItemPersistDTO);
+		validate(pedidoId, pedidoItemPersistDTO);
 		pedidoItemPersistDTO.setPedidoId(pedidoId);
 		PedidoItem pedidoItem = modelMapper.map(pedidoItemPersistDTO, PedidoItem.class);
 
@@ -84,12 +94,11 @@ public class PedidoItemServiceImpl implements PedidoItemService {
 		return toResponseDTO(repository.save(pedidoItem));
 	}
 
+	@Transactional(readOnly = true)
 	@Override
-	public List<PedidoItemResponseDTO> findAll() {
-		return repository.findAll()
-			.stream()
-			.map(this::toResponseDTO)
-			.collect(Collectors.toList());
+	public Page<PedidoItemResponseDTO> findAll(Pageable pageable, PedidoItemFilterDTO filter) {
+		return repository.findAll(pageable, filter)
+			.map(this::toResponseDTO);
 	}
 
 	private PedidoItemResponseDTO toResponseDTO(PedidoItem pedidoItem) {

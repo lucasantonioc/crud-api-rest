@@ -1,5 +1,7 @@
 package com.lucas.crudapirest.handle;
 
+import com.lucas.crudapirest.exception.BusinessException;
+import com.lucas.crudapirest.exception.RecordNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +20,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ DataIntegrityViolationException.class })
     public ResponseEntity<Object> handleBusinessException(DataIntegrityViolationException dataIntegrityViolationException) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Este registro não pode ser removido pois já está sendo utilizado.");
+    }
+
+    @ExceptionHandler({ RecordNotFoundException.class })
+    public ResponseEntity<Object> handleBusinessException(RecordNotFoundException recordNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(recordNotFoundException.getMessage());
+    }
+
+    @ExceptionHandler({ BusinessException.class })
+    public ResponseEntity<Object> handleBusinessException(BusinessException businessException) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(businessException.getMessage());
     }
 
 }

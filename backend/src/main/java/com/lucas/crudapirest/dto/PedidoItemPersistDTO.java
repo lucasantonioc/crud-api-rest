@@ -10,9 +10,11 @@ import jakarta.validation.constraints.NotNull;
 @Builder
 public class PedidoItemPersistDTO {
 
+	@Builder.Default
 	@NotNull
 	private BigDecimal valorUnitarioVenda = BigDecimal.ZERO;
 
+	@Builder.Default
 	@NotNull
 	private BigDecimal quantidade = BigDecimal.ZERO;
 

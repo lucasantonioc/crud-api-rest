@@ -10,14 +10,8 @@ import com.lucas.crudapirest.enumeration.*;
 @Builder
 public class ProdutoServicoUpdateDTO {
 
-	private UUID id;
-
 	private BigDecimal valorUnitario;
 
 	private String descricao;
-
-	private EnumStatusProdutoServico status;
-
-	private EnumTipoProdutoServico tipo;
 
 }

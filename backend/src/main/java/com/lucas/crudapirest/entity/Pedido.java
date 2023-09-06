@@ -6,6 +6,8 @@ import java.io.Serializable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,14 +30,17 @@ public class Pedido implements Serializable {
 	@GeneratedValue
 	private UUID id;
 
+	@Builder.Default
 	@PositiveOrZero
 	@Column(name = "valor_bruto", nullable = false)
 	private BigDecimal valorBruto = BigDecimal.ZERO;
 
+	@Builder.Default
 	@PositiveOrZero
 	@Column(name = "valor_liquido", nullable = false)
 	private BigDecimal valorLiquido = BigDecimal.ZERO;
 
+	@Builder.Default
 	@PositiveOrZero
 	@Column(name = "percentual_desconto", nullable = false)
 	private BigDecimal percentualDesconto = BigDecimal.ZERO;
@@ -43,12 +48,14 @@ public class Pedido implements Serializable {
 	@Column(name = "observacao")
 	private String observacao;
 
+	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private EnumStatusPedido status = ABERTO;
 
+	@Builder.Default
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "pedido")
-	private List<PedidoItem> itens;
+	private List<PedidoItem> itens = new ArrayList<>();
 
 	public boolean isAberto() {
 		return this.status == ABERTO;
@@ -65,8 +72,12 @@ public class Pedido implements Serializable {
 		observacao = ofNullable(pedidoUpdateDTO.getObservacao()).orElse(observacao);
 	}
 
-	public void fechar() {
-		this.status = FECHADO;
+	public void alterarStatus() {
+		if (this.status == ABERTO) {
+			this.status = FECHADO;
+		} else {
+			this.status = ABERTO;
+		}
 	}
 
 	public void recalcularTotaisPedido() {
@@ -78,13 +89,20 @@ public class Pedido implements Serializable {
 			this.percentualDesconto = percentualDesconto;
 		}
 
+		if (this.getItens().size() == 0) {
+			return;
+		}
+
 		BigDecimal valorTotalProdutos = BigDecimal.ZERO;
 		for (PedidoItem item : this.getItens()) {
 			if (item.getProdutoServico().isProduto()) {
 				valorTotalProdutos = valorTotalProdutos.add(item.getValorUnitarioVenda().multiply(item.getQuantidade()));
 			}
 		}
-		valorTotalProdutos = valorTotalProdutos.subtract(valorTotalProdutos.multiply(percentualDesconto.divide(BigDecimal.valueOf(100))));
+
+		valorTotalProdutos = valorTotalProdutos.intValue() > 0
+				? valorTotalProdutos.subtract(valorTotalProdutos.multiply(percentualDesconto.divide(BigDecimal.valueOf(100))))
+				: valorTotalProdutos;
 		this.valorLiquido = valorTotalProdutos;
 	}
 

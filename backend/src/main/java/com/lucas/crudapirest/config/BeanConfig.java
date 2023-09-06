@@ -23,4 +23,5 @@ public class BeanConfig {
                         .description("Your API Description")
                         .version("0.0.1"));
     }
+
 }

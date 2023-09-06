@@ -1,6 +1,9 @@
 package com.lucas.crudapirest.controller;
 
+import com.lucas.crudapirest.dto.filter.PedidoItemFilterDTO;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +18,12 @@ import java.util.UUID;
 @RequestMapping("api/v1/")
 public class PedidoItemController {
 
+	private final PedidoItemService service;
+
 	@Autowired
-	private PedidoItemService service;
+	public PedidoItemController(PedidoItemService service) {
+		this.service = service;
+	}
 
 	@PostMapping("pedidos/{pedidoId}/itens")
 	public ResponseEntity<PedidoItemResponseDTO> create(@PathVariable UUID pedidoId, @RequestBody @Valid PedidoItemPersistDTO pedidoItemPersistDTO) {
@@ -45,8 +52,8 @@ public class PedidoItemController {
 	}
 
 	@GetMapping("itens")
-	public ResponseEntity<List<PedidoItemResponseDTO>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	public ResponseEntity<Page<PedidoItemResponseDTO>> findAll(Pageable pageable, @RequestBody @Valid PedidoItemFilterDTO filter) {
+		return ResponseEntity.ok(service.findAll(pageable, filter));
 	}
 
 }
