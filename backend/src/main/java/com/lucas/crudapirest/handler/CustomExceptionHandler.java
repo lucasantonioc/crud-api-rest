@@ -1,4 +1,4 @@
-package com.lucas.crudapirest.handle;
+package com.lucas.crudapirest.handler;
 
 import com.lucas.crudapirest.exception.BusinessException;
 import com.lucas.crudapirest.exception.RecordNotFoundException;
